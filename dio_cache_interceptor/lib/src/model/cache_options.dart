@@ -81,12 +81,19 @@ class CacheOptions {
   static const _extraKey = '@cache_options@';
 
   // UUID helper to mark requests
-  static final _uuid = Uuid();
+  static const _uuid = Uuid();
 
   // To save even if Response.data is null
   final bool saveWhenNull;
 
+  /// Whether or not to call the the response interceptors when the response is
+  /// resolved manually with [handler.response].
+  ///
+  /// This is [callFollowingResponseInterceptor] in the [resolve] method.
+  final bool callResponseInterceptorsOnResolve;
+
   const CacheOptions({
+    required this.store,
     this.policy = CachePolicy.request,
     this.hitCacheOnErrorExcept,
     this.keyBuilder = defaultCacheKeyBuilder,
@@ -95,7 +102,7 @@ class CacheOptions {
     this.cipher,
     this.allowPostMethod = false,
     this.saveWhenNull = true,
-    required this.store,
+    this.callResponseInterceptorsOnResolve = true,
   });
 
   static CacheOptions? fromExtra(RequestOptions request) {
@@ -123,7 +130,8 @@ class CacheOptions {
     CacheStore? store,
     Nullable<CacheCipher>? cipher,
     bool? allowPostMethod,
-    bool? saveWhenNull
+    bool? saveWhenNull,
+    bool? callResponseInterceptorsOnResolve,
   }) {
     return CacheOptions(
       policy: policy ?? this.policy,
@@ -137,6 +145,8 @@ class CacheOptions {
       cipher: cipher != null ? cipher.value : this.cipher,
       allowPostMethod: allowPostMethod ?? this.allowPostMethod,
       saveWhenNull: saveWhenNull ?? this.saveWhenNull,
+      callResponseInterceptorsOnResolve: callResponseInterceptorsOnResolve ??
+          this.callResponseInterceptorsOnResolve,
     );
   }
 }

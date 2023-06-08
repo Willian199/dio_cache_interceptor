@@ -57,7 +57,7 @@ class DioCacheInterceptor extends Interceptor {
 
       handler.resolve(
         cacheResponse.toResponse(options, fromNetwork: false),
-        true,
+        cacheOptions.callResponseInterceptorsOnResolve,
       );
       return;
     }
@@ -74,11 +74,12 @@ class DioCacheInterceptor extends Interceptor {
   ) async {
     final cacheOptions = _getCacheOptions(response.requestOptions);
 
-    if ((!cacheOptions.saveWhenNull && response.data == null) || _shouldSkip(
-      response.requestOptions,
-      response: response,
-      options: cacheOptions,
-    )) {
+    if ((!cacheOptions.saveWhenNull && response.data == null) ||
+        _shouldSkip(
+          response.requestOptions,
+          response: response,
+          options: cacheOptions,
+        )) {
       handler.next(response);
       return;
     }
@@ -225,17 +226,15 @@ class DioCacheInterceptor extends Interceptor {
     // Determine if we can return cached response
     if (errResponse?.statusCode == 304) {
       return true;
-    } else {
-      final hcoeExcept = cacheOptions.hitCacheOnErrorExcept;
-      if (hcoeExcept == null) return false;
+    }
 
-      if (errResponse == null) {
-        // Offline or any other connection error
-        return true;
-      } else if (!hcoeExcept.contains(errResponse.statusCode)) {
-        // Status code is allowed to try cache look up.
-        return true;
-      }
+    final hcoeExcept = cacheOptions.hitCacheOnErrorExcept;
+    if (hcoeExcept == null) return false;
+
+    // Offline or any other connection error
+    if (errResponse == null || !hcoeExcept.contains(errResponse.statusCode)) {
+      // Status code is allowed to try cache look up.
+      return true;
     }
 
     return false;
