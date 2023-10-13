@@ -1,3 +1,11 @@
+## 3.4.4
+- chore: Allow UUID package version v4.x
+
+## 3.4.3
+- fix: Correctly sierialize null content responses.
+- chore: explicitly allow dart 3.
+- chore: Now requires Dio >= 5.2.0+1.
+
 ## 3.4.2
 - fix: Headers were not saved/restored in/from `CacheResponse`.
 - fix: Cache trigger now enabled again with `expires`, `Cache-Control`/`max-age`.
